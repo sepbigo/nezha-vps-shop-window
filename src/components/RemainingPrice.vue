@@ -10,7 +10,7 @@
           </span>
         </div>
       </TooltipTrigger>
-      <TooltipContent side="right" class="mr-2 bg-muted/80 text-muted-foreground">
+      <TooltipContent side="right" class="ml-2 -mt-8 bg-muted/80 text-muted-foreground">
         <p>{{ $t('remaining') }}</p>
       </TooltipContent>
     </Tooltip>

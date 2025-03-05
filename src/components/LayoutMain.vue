@@ -126,16 +126,20 @@ onBeforeMount(async () => {
     :style="`background-image: ${backgroundImage};`"></div>
   <div class="flex min-h-screen w-full md:max-w-6xl mx-auto flex-col">
     <header :class="cn(
-      'bg-transparent sticky top-0 z-10 flex h-16 items-center gap-4 px-4 md:px-8'
+      'bg-transparent sticky top-0 z-10 flex h-16 justify-between items-center gap-4 px-4 md:px-8'
     )">
-      <nav class="hidden flex-col gap-4 text-lg font-medium md:flex md:flex-row md:items-center md:text-sm">
-        <a href="#" class="flex items-center gap-2 text-lg font-semibold md:text-base">
-          <Avatar class="size-8 rounded-none bg-transparent" :title="store.preferences?.customTitle">
+      <nav class="hidden gap-4 flex-1 md:flex md:items-center md:text-sm">
+        <a href="/" class="flex items-center gap-2">
+          <Avatar class="w-8 h-8 rounded-none bg-transparent" :title="store.preferences?.customTitle">
             <AvatarImage class="object-fill" :src="store.preferences?.customLogo ? store.preferences?.customLogo : logo"
               :alt="store.preferences?.customTitle" />
             <AvatarFallback>{{ store.preferences?.customTitle }}</AvatarFallback>
           </Avatar>
-          <span class="sr-only">vps shop window</span>
+          <div class="text-sm">
+            <div class="text-md">{{ store.preferences?.customTitle }}</div>
+            Sepater
+            <div class="h-4">{{ store.preferences?.customDesc }}</div>
+          </div>
         </a>
 
         <CustomNavLinks v-if="store.preferences?.customNavLinks?.length > 0"
@@ -151,7 +155,7 @@ onBeforeMount(async () => {
       </a>
       <CustomListLinks v-if="store.preferences?.customNavLinks?.length > 0"
         :links="store.preferences?.customNavLinks" />
-      <div class="flex w-full items-center justify-end gap-4 md:ml-auto md:gap-2 lg:gap-4">
+      <div class="flex items-center justify-end gap-4 md:ml-auto md:gap-2 lg:gap-4">
         <DropdownMenu>
           <DropdownMenuTrigger as-child>
             <Button variant="secondary" size="icon" class="border">

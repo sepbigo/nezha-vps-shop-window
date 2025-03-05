@@ -5,7 +5,7 @@ import { ref } from 'vue'
 export const useStore = defineStore('preferences', () => {
   const preferences = ref({
     customTitle: 'VPS橱窗',
-    customSubtitle: 'VPS Shop Window',
+    customDesc: 'VPS Shop Window',
     customLogo: '',
     customLanguage: 'zh-CN',
     customTheme: 'slate',

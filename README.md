@@ -23,8 +23,8 @@
     "customLogo": "https://image.bmqy.net/wp-content/uploads/2018/09/logo-1.png",
     // 自定义标题
     "customTitle": "VPS橱窗",
-    // 自定义副标题
-    "customSubtitle": "VPS Shop Window",
+    // 自定义描述
+    "customDesc": "VPS Shop Window",
     // 应用主题
     "customTheme": "rose",
     // 语言：zh-CN、en，默认zh-CN
