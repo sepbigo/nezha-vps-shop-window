@@ -1,0 +1,53 @@
+<template>
+  <TooltipProvider>
+    <Tooltip>
+      <TooltipTrigger>
+        <div class="flex flex-row text-primary/80 drop-shadow justify-start items-center">
+          <span :class="cn(
+            'font-money tracking-widest relative block -rotate-2 -mt-10',
+            `after:absolute after:block after:content-[''] after:-bottom-1 after:-left-1 after:-right-1 z-10 after:h-1 after:-z-10 after:border-primary after:border-t after:border-b`,
+          )">{{ ramainingData.remainingPrice }}{{ ramainingData.priceUnit }}
+          </span>
+        </div>
+      </TooltipTrigger>
+      <TooltipContent side="right" class="mr-2 bg-muted/80 text-muted-foreground">
+        <p>{{ $t('remaining') }}</p>
+      </TooltipContent>
+    </Tooltip>
+  </TooltipProvider>
+</template>
+<script setup>
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from '@/components/shadcn/ui/tooltip';
+import { parseRemainingData } from '@/lib/function';
+import { cn } from '@/lib/utils';
+import { computed } from 'vue';
+
+const props = defineProps({
+  data: {
+    type: Object,
+    default() {
+      return {
+        amount: '0.00',
+        startDate: '',
+        endDate: '',
+        cycle: '年',
+        autoRenewal: '0',
+        remainingPrice: 0.00,
+        priceUnit: '',
+        priceValue: '',
+      }
+    }
+  },
+})
+
+const ramainingData = computed(() => {
+  return parseRemainingData(props.data);
+})
+</script>
+
+<style scoped></style>
