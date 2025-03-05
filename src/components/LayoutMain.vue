@@ -131,7 +131,7 @@ onBeforeMount(async () => {
     )">
       <nav class="hidden gap-4 flex-1 md:flex md:items-center md:text-sm">
         <a href="/" class="flex items-center gap-2">
-          <Avatar class="size-10 rounded-none bg-transparent" :title="store.preferences?.customTitle">
+          <Avatar class="size-10 rounded-md bg-transparent" :title="store.preferences?.customTitle">
             <AvatarImage class="object-fill" :src="store.preferences?.customLogo ? store.preferences?.customLogo : logo"
               :alt="store.preferences?.customTitle" />
             <AvatarFallback>{{ store.preferences?.customTitle }}</AvatarFallback>
@@ -148,7 +148,7 @@ onBeforeMount(async () => {
       </nav>
       <nav class="md:hidden gap-4 flex-1 flex items-center text-sm">
         <a href="#" class="flex items-center gap-2 text-lg font-semibold">
-          <Avatar class="size-10 rounded-none bg-transparent" :title="store.preferences?.customTitle">
+          <Avatar class="size-10 rounded-md bg-transparent" :title="store.preferences?.customTitle">
             <AvatarImage class="object-fill" :src="store.preferences?.customLogo ? store.preferences?.customLogo : logo"
               :alt="store.preferences?.customTitle" />
             <AvatarFallback>{{ store.preferences?.customTitle }}</AvatarFallback>
