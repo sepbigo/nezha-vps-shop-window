@@ -3,6 +3,7 @@ import logo from '@/assets/logo.svg'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/shadcn/ui/avatar'
 import { Button } from '@/components/shadcn/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/shadcn/ui/dropdown-menu'
+import { Separator } from '@/components/shadcn/ui/separator'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/shadcn/ui/sheet'
 import { getSetting } from '@/lib/api'
 import { cn } from '@/lib/utils'
@@ -219,8 +220,11 @@ onBeforeMount(async () => {
     </main>
     <footer>
       <div class="flex flex-row items-center justify-center py-8 w-full">
-        <p class="text-gray-400 text-xs">&COPY;2025 {{ store.preferences?.customTitle || 'VPS橱窗' }}， {{
-      store.preferences?.customDesc || 'VPS Shop Window' }}</p>
+        <p class="flex flex-col md:flex-row justify-center items-center gap-1 text-gray-400 text-xs text-center">
+          <span>&COPY;2025 {{ store.preferences?.customTitle || 'VPS橱窗' }}</span>
+          <Separator orientation="vertical" class="hidden md:inline-flex h-2" />
+          <span>{{ store.preferences?.customDesc || 'VPS Shop Window' }}</span>
+        </p>
       </div>
     </footer>
   </div>
