@@ -10,7 +10,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useStore } from '@/stores';
 import { PcCase, Wifi, WifiOff } from 'lucide-vue-next';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import BuyLink from './BuyLink.vue';
 import CardItem from './CardItem.vue';
 import IconCountry from './IconCountry.vue';
@@ -56,11 +56,26 @@ const offlineCount = computed(() => {
   }).length;
 })
 
+const filterType = ref('all');
 
+const filteredList = computed(() => {
+  if (filterType.value === 'online') {
+    return props.list.filter(item => item.online);
+  } else if (filterType.value === 'offline') {
+    return props.list.filter(item => !item.online);
+  }
+  return props.list;
+});
+
+const handleFilterClick = (type) => {
+  filterType.value = type;
+}
 </script>
 <template>
   <div class="grid gap-2 md:gap-4 grid-cols-3">
-    <Card :class="cn(store.preferences?.useSemitransparent && 'bg-card/70')">
+    <Card
+      :class="cn(store.preferences?.useSemitransparent && 'bg-card/70', filterType === 'all' ? 'ring-2 ring-primary' : '')"
+      class="cursor-pointer transition-all hover:shadow" @click="handleFilterClick('all')">
       <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle class="text-sm font-medium">
           {{ $t('total') }}
@@ -69,12 +84,13 @@ const offlineCount = computed(() => {
       </CardHeader>
       <CardContent>
         <div class="flex flex-row items-center text-2xl font-bold">
-          <span class="inline-block size-3 bg-primary rounded-full mr-2" />{{ list.length
-          }}
+          <span class="inline-block size-3 bg-primary rounded-full mr-2" />{{ list.length }}
         </div>
       </CardContent>
     </Card>
-    <Card :class="cn(store.preferences?.useSemitransparent && 'bg-card/70')">
+    <Card
+      :class="cn(store.preferences?.useSemitransparent && 'bg-card/70', filterType === 'online' ? 'ring-2 ring-green-500' : '')"
+      class="cursor-pointer transition-all hover:shadow" @click="handleFilterClick('online')">
       <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle class="text-sm font-medium">
           {{ $t('online') }}
@@ -87,7 +103,9 @@ const offlineCount = computed(() => {
         </div>
       </CardContent>
     </Card>
-    <Card :class="cn(store.preferences?.useSemitransparent && 'bg-card/70')">
+    <Card
+      :class="cn(store.preferences?.useSemitransparent && 'bg-card/70', filterType === 'offline' ? 'ring-2 ring-destructive' : '')"
+      class="cursor-pointer transition-all hover:shadow" @click="handleFilterClick('offline')">
       <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle class="text-sm font-medium">
           {{ $t('offline') }}
@@ -104,16 +122,14 @@ const offlineCount = computed(() => {
   <div class="">
     <div v-if="status != 'OPEN'" class="text-sm text-center">{{ $t('connecting') }}</div>
     <div v-else class="grid gap-4 md:grid-cols-2">
-      <Card v-for="(item, index) in list" :key="index"
+      <Card v-for="(item, index) in filteredList" :key="index"
         :class="cn(store.preferences?.useSemitransparent && 'bg-card/70')">
         <CardHeader>
           <CardTitle>
             <div class="flex flex-row gap-8 justify-between items-center">
               <div class="flex items-center py-2">
                 <IconCountry v-if="item.online" :countryCode="item.country_code" :online="item.online" class="mr-2" />
-                <span class="mr-2 text-left break-all">{{
-      item.name
-    }}</span>
+                <span class="mr-2 text-left break-all">{{ item.name }}</span>
                 <Platform v-if="item.online" type="badge" :platform="item.host.platform" />
               </div>
               <div class="flex flex-row gap-1 justify-start items-center">
@@ -139,12 +155,12 @@ const offlineCount = computed(() => {
             <Progress v-if="item.online" :onlyText="true" :percentage="item?.state?.cpu?.toFixed(2) || 0" />
           </CardItem>
           <CardItem label="mem" :online="item.online">
-            <Progress v-if="list[index].online" :onlyText="true"
-              :percentage="(list[index]?.state?.mem_used / list[index]?.host?.mem_total * 100).toFixed(2)" />
+            <Progress v-if="item.online" :onlyText="true"
+              :percentage="(item?.state?.mem_used / item?.host?.mem_total * 100).toFixed(2)" />
           </CardItem>
           <CardItem label="stg" :online="item.online">
-            <Progress v-if="list[index].online" :onlyText="true"
-              :percentage="(list[index]?.state?.disk_used / list[index]?.host?.disk_total * 100).toFixed(2)" />
+            <Progress v-if="item.online" :onlyText="true"
+              :percentage="(item?.state?.disk_used / item?.host?.disk_total * 100).toFixed(2)" />
           </CardItem>
         </CardContent>
         <CardFooter class="px-6 pb-6 flex justify-between items-center">
