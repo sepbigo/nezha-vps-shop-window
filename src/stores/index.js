@@ -57,22 +57,46 @@ export const useLanguageStore = defineStore('language', () => {
 // UI相关状态
 export const useUIStore = defineStore('ui', () => {
   const useSemitransparent = ref(localStorage.getItem('USE_SEMITRANSPARENT') === 'true' || false)
+  const useBackgroundImage = ref(localStorage.getItem('USE_BACKGROUND_IMAGE') === 'true' || false)
+  const customBackgroundImage = ref('')
 
   function toggleSemitransparent() {
     useSemitransparent.value = !useSemitransparent.value
     localStorage.setItem('USE_SEMITRANSPARENT', useSemitransparent.value)
   }
 
-  const customBackgroundImage = ref('')
+  function toggleBackgroundImage() {
+    useBackgroundImage.value = !useBackgroundImage.value
+    localStorage.setItem('USE_BACKGROUND_IMAGE', useBackgroundImage.value)
+
+    if (!useBackgroundImage.value) {
+      // 关闭壁纸时，如果半透明已开启则关闭半透明
+      if (useSemitransparent.value) {
+        useSemitransparent.value = false
+        localStorage.setItem('USE_SEMITRANSPARENT', false)
+      }
+      customBackgroundImage.value = ''
+    }
+  }
 
   function setBackgroundImage(imageUrl) {
     customBackgroundImage.value = imageUrl
+    useBackgroundImage.value = true
+    localStorage.setItem('USE_BACKGROUND_IMAGE', true)
+
+    // 开启壁纸时，如果半透明未开启则自动开启
+    if (!useSemitransparent.value) {
+      useSemitransparent.value = true
+      localStorage.setItem('USE_SEMITRANSPARENT', true)
+    }
   }
 
   return {
     useSemitransparent,
-    toggleSemitransparent,
+    useBackgroundImage,
     customBackgroundImage,
+    toggleSemitransparent,
+    toggleBackgroundImage,
     setBackgroundImage,
   }
 })
@@ -122,6 +146,7 @@ export const useStore = defineStore('main', () => {
   const currentTheme = computed(() => themeStore.currentTheme)
   const currentLanguage = computed(() => languageStore.currentLanguage)
   const useSemitransparent = computed(() => uiStore.useSemitransparent)
+  const useBackgroundImage = computed(() => uiStore.useBackgroundImage)
   const customBackgroundImage = computed(() => uiStore.customBackgroundImage)
   const preferences = computed(() => appStore.preferences)
   const error = computed(() => appStore.error)
@@ -137,6 +162,10 @@ export const useStore = defineStore('main', () => {
 
   function toggleSemitransparent() {
     uiStore.toggleSemitransparent()
+  }
+
+  function toggleBackgroundImage() {
+    uiStore.toggleBackgroundImage()
   }
 
   function setBackgroundImage(imageUrl) {
@@ -156,6 +185,7 @@ export const useStore = defineStore('main', () => {
     currentTheme,
     currentLanguage,
     useSemitransparent,
+    useBackgroundImage,
     customBackgroundImage,
     preferences,
     error,
@@ -163,6 +193,7 @@ export const useStore = defineStore('main', () => {
     changeTheme,
     changeLanguage,
     toggleSemitransparent,
+    toggleBackgroundImage,
     setBackgroundImage,
     setPreferences,
     setError,

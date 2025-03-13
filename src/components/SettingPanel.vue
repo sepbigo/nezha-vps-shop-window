@@ -21,9 +21,8 @@
     </div>
     <div class="mt-5 flex items-center justify-between">
       <label for="theme">{{ $t('backgroundImage') }}</label>
-      <Button variant="secondary" size="icon" class="border" @click="changeBackgroundImage">
-        <Images class="size-5" />
-      </Button>
+      <Switch :model-value="store.useBackgroundImage" @update:model-value="handleBackgroundImageToggle">
+      </Switch>
     </div>
   </div>
 </template>
@@ -31,7 +30,6 @@
 import { Button } from '@/components/shadcn/ui/button';
 import { Switch } from '@/components/shadcn/ui/switch';
 import { useStore } from '@/stores';
-import { Images } from 'lucide-vue-next';
 
 const store = useStore();
 
@@ -42,9 +40,11 @@ defineProps({
   },
 });
 
-function changeBackgroundImage() {
-  store.setBackgroundImage(`https://picsum.photos/1920/1080?random=${Math.random()}`);
-  store.toggleSemitransparent();
+function handleBackgroundImageToggle(value) {
+  store.toggleBackgroundImage();
+  if (value) {
+    store.setBackgroundImage(`https://picsum.photos/1920/1080?random=${Math.random()}`);
+  }
 }
 </script>
 
