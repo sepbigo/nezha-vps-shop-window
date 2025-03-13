@@ -1,19 +1,9 @@
 import { setI18nLanguage } from '@/locales/i18n'
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
-export const useStore = defineStore('preferences', () => {
-  const preferences = ref({
-    customTitle: 'VPS橱窗',
-    customDesc: 'VPS Shop Window',
-    customLogo: '',
-    customLanguage: 'zh-CN',
-    customTheme: 'slate',
-    useSemitransparent: false,
-    customNavLinks: [],
-    layoutStyle: 'card',
-  })
-
+// 主题相关状态
+export const useThemeStore = defineStore('theme', () => {
   const themeList = ref([
     'zinc',
     'slate',
@@ -28,62 +18,153 @@ export const useStore = defineStore('preferences', () => {
     'yellow',
     'violet',
   ])
-  function setPreferences(data) {
-    for (let key in data) {
-      preferences.value[key] = data[key]
-    }
-  }
-  async function getSemitransparent() {
-    return (
-      localStorage.getItem('USE_SEMITRANSPARENT') || preferences.value.useSemitransparent || false
-    )
-  }
-  function toggleSemitransparent() {
-    preferences.value.useSemitransparent = !preferences.value.useSemitransparent
-    localStorage.setItem('USE_SEMITRANSPARENT', preferences.value.useSemitransparent)
-  }
-  function useBackgroundImage() {
-    preferences.value.useSemitransparent = true
-    preferences.value.customBackgroundImage = `https://picsum.photos/1920/1080?random=${Math.random()}`
-  }
 
-  function getLanguage() {
-    return (
-      localStorage.getItem('CUSTOM_LANGUAGE') ||
-      preferences.value.customLanguage ||
-      navigator.language ||
-      'zh-CN'
-    )
-  }
-  function changeLanguage(language) {
-    preferences.value.customLanguage = language
-    localStorage.setItem('CUSTOM_LANGUAGE', language)
-    setI18nLanguage(language)
-  }
-
-  function getTheme() {
-    return localStorage.getItem('CUSTOM_THEME') || preferences.value.customTheme || 'slate'
-  }
+  const currentTheme = ref(localStorage.getItem('CUSTOM_THEME') || 'slate')
 
   function changeTheme(theme) {
-    let oldTheme = getTheme()
+    let oldTheme = currentTheme.value
     document?.querySelector('html')?.classList.remove(`theme-${oldTheme}`)
-    preferences.value.customTheme = theme
+    currentTheme.value = theme
     document?.querySelector('html')?.classList.add(`theme-${theme}`)
-
     localStorage.setItem('CUSTOM_THEME', theme)
   }
 
   return {
-    preferences,
     themeList,
-    setPreferences,
-    getSemitransparent,
-    toggleSemitransparent,
-    useBackgroundImage,
-    getLanguage,
-    changeLanguage,
-    getTheme,
+    currentTheme,
     changeTheme,
+  }
+})
+
+// 语言相关状态
+export const useLanguageStore = defineStore('language', () => {
+  const currentLanguage = ref(
+    localStorage.getItem('CUSTOM_LANGUAGE') || navigator.language || 'zh-CN',
+  )
+
+  function changeLanguage(language) {
+    currentLanguage.value = language
+    localStorage.setItem('CUSTOM_LANGUAGE', language)
+    setI18nLanguage(language)
+  }
+
+  return {
+    currentLanguage,
+    changeLanguage,
+  }
+})
+
+// UI相关状态
+export const useUIStore = defineStore('ui', () => {
+  const useSemitransparent = ref(localStorage.getItem('USE_SEMITRANSPARENT') === 'true' || false)
+
+  function toggleSemitransparent() {
+    useSemitransparent.value = !useSemitransparent.value
+    localStorage.setItem('USE_SEMITRANSPARENT', useSemitransparent.value)
+  }
+
+  const customBackgroundImage = ref('')
+
+  function setBackgroundImage(imageUrl) {
+    customBackgroundImage.value = imageUrl
+  }
+
+  return {
+    useSemitransparent,
+    toggleSemitransparent,
+    customBackgroundImage,
+    setBackgroundImage,
+  }
+})
+
+// 应用配置状态
+export const useAppStore = defineStore('app', () => {
+  const preferences = ref({
+    customTitle: 'VPS橱窗',
+    customDesc: 'VPS Shop Window',
+    customLogo: '',
+    customNavLinks: [],
+    layoutStyle: 'card',
+  })
+
+  const error = ref(null)
+
+  function setPreferences(data) {
+    preferences.value = {
+      ...preferences.value,
+      ...data,
+    }
+  }
+
+  function setError(message) {
+    error.value = message
+    setTimeout(() => {
+      error.value = null
+    }, 5000)
+  }
+
+  return {
+    preferences,
+    error,
+    setPreferences,
+    setError,
+  }
+})
+
+// 主store，组合所有子store
+export const useStore = defineStore('main', () => {
+  const themeStore = useThemeStore()
+  const languageStore = useLanguageStore()
+  const uiStore = useUIStore()
+  const appStore = useAppStore()
+
+  // 计算属性
+  const currentTheme = computed(() => themeStore.currentTheme)
+  const currentLanguage = computed(() => languageStore.currentLanguage)
+  const useSemitransparent = computed(() => uiStore.useSemitransparent)
+  const customBackgroundImage = computed(() => uiStore.customBackgroundImage)
+  const preferences = computed(() => appStore.preferences)
+  const error = computed(() => appStore.error)
+
+  // 方法
+  function changeTheme(theme) {
+    themeStore.changeTheme(theme)
+  }
+
+  function changeLanguage(language) {
+    languageStore.changeLanguage(language)
+  }
+
+  function toggleSemitransparent() {
+    uiStore.toggleSemitransparent()
+  }
+
+  function setBackgroundImage(imageUrl) {
+    uiStore.setBackgroundImage(imageUrl)
+  }
+
+  function setPreferences(data) {
+    appStore.setPreferences(data)
+  }
+
+  function setError(message) {
+    appStore.setError(message)
+  }
+
+  return {
+    // 状态
+    currentTheme,
+    currentLanguage,
+    useSemitransparent,
+    customBackgroundImage,
+    preferences,
+    error,
+    // 方法
+    changeTheme,
+    changeLanguage,
+    toggleSemitransparent,
+    setBackgroundImage,
+    setPreferences,
+    setError,
   }
 })

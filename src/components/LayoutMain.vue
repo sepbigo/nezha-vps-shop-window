@@ -109,8 +109,8 @@ onBeforeMount(async () => {
 
     // 应用配置
     store.setPreferences(newPreferences);
-    store.changeLanguage(store.getLanguage());
-    store.changeTheme(store.getTheme());
+    store.changeLanguage(store.currentLanguage);
+    store.changeTheme(store.currentTheme);
 
     // 更新背景图片
     if (newPreferences?.customBackgroundImage) {
