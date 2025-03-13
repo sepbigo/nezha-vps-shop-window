@@ -22,102 +22,42 @@ const store = useStore();
 const settings = ref({});
 const backgroundImage = ref('');
 
-const parseCustomPreferences = async (customCode) => {
-  try {
-    const domparser = new DOMParser();
-    const dom = domparser.parseFromString(customCode, 'text/html');
-
-    // 解析外部脚本
-    const externalScript = Array.from(dom.querySelectorAll('script'));
-    const parsedPreferences = await Promise.all(externalScript.map(script => {
-      const scriptLang = script.getAttribute('lang');
-      const scriptRel = script.getAttribute('rel');
-
-      // 解析个性化配置
-      if (scriptLang === 'json' && scriptRel === 'preferences') {
-        try {
-          return JSON.parse(script?.innerHTML || '{}');
-        } catch (error) {
-          console.error('解析JSON配置失败:', error);
-          return {};
-        }
-      } else if (scriptLang === 'json' && scriptRel === 'resource') {
-        // 解析外部资源
-        let resourceArray = JSON.parse(script?.innerHTML || '[]')
-        resourceArray.map(res => new Promise((resolve, reject) => {
-          if (res.endsWith('css')) {
-            let linkElement = document.createElement('link');
-            linkElement.rel = 'stylesheet';
-            linkElement.href = res;
-            linkElement.crossOrigin = 'anonymous';
-            linkElement.onload = resolve;
-            linkElement.onerror = reject;
-            document.head.appendChild(linkElement);
-          } else if (res.endsWith('js')) {
-            let scriptElement = document.createElement('script');
-            scriptElement.src = res;
-            scriptElement.crossOrigin = 'anonymous';
-            scriptElement.onload = resolve;
-            scriptElement.onerror = reject;
-            document.head.appendChild(scriptElement);
-          }
-        }));
-      } else {
-        new Promise((resolve, reject) => {
-          let scriptElement = document.createElement('script');
-          scriptElement.innerHTML = script?.innerHTML;
-          scriptElement.onload = resolve;
-          scriptElement.onerror = reject;
-          document.head.appendChild(scriptElement);
-        })
-      }
-    }));
-
-    // 解析外部style
-    const externalStyle = Array.from(dom.querySelectorAll('style'));
-    await Promise.all(externalStyle.map(style => {
-      return new Promise((resolve, reject) => {
-        let styleElement = document.createElement('style');
-        styleElement.innerHTML = style?.innerHTML;
-        styleElement.onload = resolve;
-        styleElement.onerror = reject;
-        document.head.appendChild(styleElement);
-      })
-    }));
-
-    return parsedPreferences.reduce((acc, curr) => ({ ...acc, ...curr }), {});
-  } catch (error) {
-    console.error('解析自定义配置失败:', error);
-    return {};
-  }
-};
-
 onBeforeMount(async () => {
   try {
     settings.value = await getSetting();
-    const customCode = settings.value?.data?.config?.custom_code;
-    if (!customCode) return;
 
-    // 解析自定义配置
-    const customPreferences = await parseCustomPreferences(customCode);
+    // 更新store中的偏好设置
+    if (settings.value?.preferences) {
+      store.setPreferences(settings.value.preferences);
 
-    // 更新配置
-    const newPreferences = {
-      ...store.preferences,
-      ...customPreferences
-    };
+      // 应用壁纸设置
+      if (settings.value.preferences.customBackgroundImage) {
+        backgroundImage.value = `url(${settings.value.preferences.customBackgroundImage})`;
+        // 先设置背景图片URL，再开启壁纸功能
+        store.setBackgroundImage(settings.value.preferences.customBackgroundImage);
+        if (!store.useBackgroundImage) {
+          store.toggleBackgroundImage();
+        }
+      }
 
-    // 应用配置
-    store.setPreferences(newPreferences);
-    store.changeLanguage(store.currentLanguage);
-    store.changeTheme(store.currentTheme);
+      // 应用半透明设置
+      if (settings.value.preferences.useSemitransparent && !store.useSemitransparent) {
+        store.toggleSemitransparent();
+      }
 
-    // 更新背景图片
-    if (newPreferences?.customBackgroundImage) {
-      backgroundImage.value = `url(${newPreferences.customBackgroundImage})`;
+      // 应用语言设置
+      if (settings.value.preferences.customLanguage) {
+        store.changeLanguage(settings.value.preferences.customLanguage);
+      }
+
+      // 应用主题设置
+      if (settings.value.preferences.customTheme) {
+        store.changeTheme(settings.value.preferences.customTheme);
+        mode.value = settings.value.preferences.customTheme;
+      }
     }
   } catch (error) {
-    console.error('初始化配置失败:', error);
+    console.error('获取设置失败:', error);
   }
 });
 </script>

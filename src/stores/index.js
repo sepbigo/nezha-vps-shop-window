@@ -108,7 +108,9 @@ export const useAppStore = defineStore('app', () => {
     customDesc: 'VPS Shop Window',
     customLogo: '',
     customNavLinks: [],
-    layoutStyle: 'card',
+    customBackgroundImage: '',
+    customTheme: 'rose',
+    useSemitransparent: false,
   })
 
   const error = ref(null)
