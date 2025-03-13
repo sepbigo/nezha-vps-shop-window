@@ -152,6 +152,7 @@ export const useStore = defineStore('main', () => {
   const customBackgroundImage = computed(() => uiStore.customBackgroundImage)
   const preferences = computed(() => appStore.preferences)
   const error = computed(() => appStore.error)
+  const themeList = computed(() => themeStore.themeList)
 
   // 方法
   function changeTheme(theme) {
@@ -191,6 +192,7 @@ export const useStore = defineStore('main', () => {
     customBackgroundImage,
     preferences,
     error,
+    themeList,
     // 方法
     changeTheme,
     changeLanguage,
