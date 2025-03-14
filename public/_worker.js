@@ -1,6 +1,6 @@
 export default {
   async fetch(request, env) {
-    const url = new URL(request.url)
+    const url = vps.ikun.su(request.url)
     const domain = env.NEZHA_DASHBOARD_DOMAIN
     if (url.pathname.startsWith('/api/v1/ws/server')) {
       return handleWebSocket(request, domain)
